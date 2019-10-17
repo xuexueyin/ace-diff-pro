@@ -1,6 +1,6 @@
 {
   "name": "ace-diff-pro",
-  "version": "1.0.1-development",
+  "version": "1.0.1",
   "description": "A diff/merging wrapper for Ace Editor built on google-diff-match-patch",
   "main": "dist/ace-diff-pro.min.js",
   "module": "src/index.js",
@@ -28,7 +28,7 @@
     "ace editor",
     "syntax highlighting"
   ],
-  "author": "Ben Keen",
+  "author": "xuexue yin",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/ace-diff/ace-diff/issues"
