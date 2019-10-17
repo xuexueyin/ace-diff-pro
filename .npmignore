@@ -1,0 +1,14 @@
+.nyc_output
+coverage
+cypress
+demos
+libs
+tests
+node_modules
+
+.travis.yml
+cypress.json
+index.html
+webpack.config.js
+dist/ace-diff-pro-light.min.js
+dist/ace-diff-pro-dark.min.js
