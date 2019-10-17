@@ -1,4 +1,4 @@
-describe('Ace-diff API', () => {
+describe('Ace-diff-pro API', () => {
   beforeEach(() => {
     cy.visit('http://localhost:8081/test/fixtures/complex-merge.html');
   });
