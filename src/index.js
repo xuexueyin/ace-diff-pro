@@ -33,7 +33,7 @@ function AceDiffPro(options) {
     theme: null,
     element: null,
     diffGranularity: C.DIFF_GRANULARITY_BROAD,
-    lockScrolling: false, // not implemented yet
+    lockScrolling: false,
     showDiffs: true,
     showConnectors: true,
     maxDiffs: 5000,
@@ -356,8 +356,10 @@ function addEventHandlers(acediff) {
   }
 
   const onResize = debounce(() => {
-    acediff.editors.availableHeight = document.getElementById(acediff.options.left.id).offsetHeight;
-
+    if(document.getElementById(acediff.options.left.id)){
+      acediff.editors.availableHeight = document.getElementById(acediff.options.left.id).offsetHeight;
+    };
+    
     // TODO this should re-init gutter
     acediff.diff();
   }, 250);
@@ -440,10 +442,23 @@ function updateGap(acediff, editor, scroll) {
   clearDiffs(acediff);
   decorate(acediff);
 
+  if(acediff.options.lockScrolling){
+    //editors.left and editors.right Synchronous scrolling
+    synchronousScrolling(acediff, editor, scroll);
+  };
+
   // reposition the copy containers containing all the arrows
   positionCopyContainers(acediff);
 }
 
+//editors.left and editors.right Synchronous scrolling
+function synchronousScrolling(acediff, editor, scroll){
+  if(editor == "left"){
+    acediff.editors.right.ace.getSession().setScrollTop(parseInt(scroll, 10));
+  }else if(editor == "right"){
+    acediff.editors.left.ace.getSession().setScrollTop(parseInt(scroll, 10));
+  };
+}
 
 function clearDiffs(acediff) {
   acediff.editors.left.markers.forEach(function (marker) {
@@ -759,18 +774,20 @@ function createArrow(info) {
 
 
 function createGutter(acediff) {
-  acediff.gutterHeight = document.getElementById(acediff.options.classes.gutterID).clientHeight;
-  acediff.gutterWidth = document.getElementById(acediff.options.classes.gutterID).clientWidth;
-
-  const leftHeight = getTotalHeight(acediff, C.EDITOR_LEFT);
-  const rightHeight = getTotalHeight(acediff, C.EDITOR_RIGHT);
-  const height = Math.max(leftHeight, rightHeight, acediff.gutterHeight);
-
-  acediff.gutterSVG = document.createElementNS(C.SVG_NS, 'svg');
-  acediff.gutterSVG.setAttribute('width', acediff.gutterWidth);
-  acediff.gutterSVG.setAttribute('height', height);
-
-  document.getElementById(acediff.options.classes.gutterID).appendChild(acediff.gutterSVG);
+  if(document.getElementById(acediff.options.classes.gutterID)){
+    acediff.gutterHeight = document.getElementById(acediff.options.classes.gutterID).clientHeight;
+    acediff.gutterWidth = document.getElementById(acediff.options.classes.gutterID).clientWidth;
+  
+    const leftHeight = getTotalHeight(acediff, C.EDITOR_LEFT);
+    const rightHeight = getTotalHeight(acediff, C.EDITOR_RIGHT);
+    const height = Math.max(leftHeight, rightHeight, acediff.gutterHeight);
+  
+    acediff.gutterSVG = document.createElementNS(C.SVG_NS, 'svg');
+    acediff.gutterSVG.setAttribute('width', acediff.gutterWidth);
+    acediff.gutterSVG.setAttribute('height', height);
+  
+    document.getElementById(acediff.options.classes.gutterID).appendChild(acediff.gutterSVG);
+  };
 }
 
 // acediff.editors.left.ace.getSession().getLength() * acediff.lineHeight
@@ -786,8 +803,12 @@ function createCopyContainers(acediff) {
   acediff.copyLeftContainer = document.createElement('div');
   acediff.copyLeftContainer.setAttribute('class', acediff.options.classes.copyLeftContainer);
 
-  document.getElementById(acediff.options.classes.gutterID).appendChild(acediff.copyRightContainer);
-  document.getElementById(acediff.options.classes.gutterID).appendChild(acediff.copyLeftContainer);
+  if(document.getElementById(acediff.options.classes.gutterID)){
+    document.getElementById(acediff.options.classes.gutterID).appendChild(acediff.copyRightContainer);
+  };
+  if(document.getElementById(acediff.options.classes.gutterID)){
+    document.getElementById(acediff.options.classes.gutterID).appendChild(acediff.copyLeftContainer);
+  };
 }
 
 
@@ -795,8 +816,9 @@ function clearGutter(acediff) {
   // gutter.innerHTML = '';
 
   const gutterEl = document.getElementById(acediff.options.classes.gutterID);
-  gutterEl.removeChild(acediff.gutterSVG);
-
+  if(gutterEl){
+    gutterEl.removeChild(acediff.gutterSVG);
+  };
   createGutter(acediff);
 }
 

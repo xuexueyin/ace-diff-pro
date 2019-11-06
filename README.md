@@ -102,6 +102,7 @@ Here are all the defaults. I'll explain each one in details below. Note: you onl
   showModify: true,
   showAdded: true,
   showDeleted:true,
+  lockScrolling: false,
   left: {
     content: null,
     mode: null,
@@ -148,7 +149,7 @@ Here are all the defaults. I'll explain each one in details below. Note: you onl
 - `showModify` (boolean, optional, default: `true`). Modify content color.
 - `showAdded` (boolean, optional, default: `true`). Added content color.
 - `showDeleted` (boolean, optional, default: `true`). Deleted content color.
-
+- `lockScrolling` (boolean, optional, default: `false`). editors.left and editors.right Synchronous scrolling.
 
 ### Classes
 - `diff`: the class for a diff line on either editor
