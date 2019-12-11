@@ -179,47 +179,49 @@ AceDiffPro.prototype = {
       // 4: {leftStartLine: 11, leftEndLine: 13, rightStartLine: 11, rightEndLine: 11}
 
       let addNum = 0, deleteNum = 0, modifyNum = 0;
-      this.diffs.forEach((diff) => {
-        let leftStartLine = diff.leftStartLine;
-        let leftEndLine = diff.leftEndLine;
-        let rightStartLine = diff.rightStartLine;
-        let rightEndLine = diff.rightEndLine; 
-        //保存差值
-        let leftDifferenceValue = 0, rightDifferenceValue = 0;
-        if (leftStartLine === rightStartLine && leftEndLine === rightEndLine) {
-          //相同位置处左边和右内容存在差异
-          leftDifferenceValue = leftEndLine - leftStartLine;
-          modifyNum += leftDifferenceValue;
-        }else{
-          leftDifferenceValue = leftEndLine - leftStartLine; //左边变动行数
-          rightDifferenceValue = rightEndLine - rightStartLine;//右边变动行数
-          if(leftDifferenceValue == 0 && rightDifferenceValue > 0){
-            //表示左边这个位置没有内容,右边有新增加行
-            addNum += rightDifferenceValue;
-          }else if(rightDifferenceValue == 0 && leftDifferenceValue > 0){
-            //表示右边这个位置内容被删除了,右边有内容
-            deleteNum += leftDifferenceValue;
-          }else if(leftDifferenceValue > rightDifferenceValue){
-            // //左边变动行数大于右边变动行数
-            // modifyNum += rightDifferenceValue;
-            // //计算右边册除行数
-            // let leftValue = leftDifferenceValue - rightDifferenceValue;
-            // deleteNum += leftValue;
-
-            //这种情况统一做修改
+      if(this.diffs){
+        this.diffs.forEach((diff) => {
+          let leftStartLine = diff.leftStartLine;
+          let leftEndLine = diff.leftEndLine;
+          let rightStartLine = diff.rightStartLine;
+          let rightEndLine = diff.rightEndLine; 
+          //保存差值
+          let leftDifferenceValue = 0, rightDifferenceValue = 0;
+          if (leftStartLine === rightStartLine && leftEndLine === rightEndLine) {
+            //相同位置处左边和右内容存在差异
+            leftDifferenceValue = leftEndLine - leftStartLine;
             modifyNum += leftDifferenceValue;
-          }else if(rightDifferenceValue > leftDifferenceValue){
-            // //右边变动行数大于左边变动行数
-            // modifyNum += leftDifferenceValue;
-            // //计算右边增加行数
-            // let rightValue = rightDifferenceValue - leftDifferenceValue;
-            // addNum += rightValue;
-
-            //这种情况统一做修改
-            modifyNum += rightDifferenceValue;
-          }
-        };
-      });
+          }else{
+            leftDifferenceValue = leftEndLine - leftStartLine; //左边变动行数
+            rightDifferenceValue = rightEndLine - rightStartLine;//右边变动行数
+            if(leftDifferenceValue == 0 && rightDifferenceValue > 0){
+              //表示左边这个位置没有内容,右边有新增加行
+              addNum += rightDifferenceValue;
+            }else if(rightDifferenceValue == 0 && leftDifferenceValue > 0){
+              //表示右边这个位置内容被删除了,右边有内容
+              deleteNum += leftDifferenceValue;
+            }else if(leftDifferenceValue > rightDifferenceValue){
+              // //左边变动行数大于右边变动行数
+              // modifyNum += rightDifferenceValue;
+              // //计算右边册除行数
+              // let leftValue = leftDifferenceValue - rightDifferenceValue;
+              // deleteNum += leftValue;
+  
+              //这种情况统一做修改
+              modifyNum += leftDifferenceValue;
+            }else if(rightDifferenceValue > leftDifferenceValue){
+              // //右边变动行数大于左边变动行数
+              // modifyNum += leftDifferenceValue;
+              // //计算右边增加行数
+              // let rightValue = rightDifferenceValue - leftDifferenceValue;
+              // addNum += rightValue;
+  
+              //这种情况统一做修改
+              modifyNum += rightDifferenceValue;
+            }
+          };
+        });
+      }      
       return {addNum:addNum,deleteNum:deleteNum,modifyNum:modifyNum};
   },
 
