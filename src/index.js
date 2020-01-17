@@ -342,6 +342,9 @@ function addEventHandlers(acediff) {
   acediff.editors.left.ace.getSession().on('changeScrollTop', throttle((scroll) => { updateGap(acediff, 'left', scroll); }, 16));
   acediff.editors.right.ace.getSession().on('changeScrollTop', throttle((scroll) => { updateGap(acediff, 'right', scroll); }, 16));
 
+  acediff.editors.left.ace.getSession().on('changeScrollLeft', throttle((scroll) => { updateGapScrollLeft(acediff, 'left', scroll); }, 16));
+  acediff.editors.right.ace.getSession().on('changeScrollLeft', throttle((scroll) => { updateGapScrollLeft(acediff, 'right', scroll); }, 16));
+
   const diff = acediff.diff.bind(acediff);
   acediff.editors.left.ace.on('change', diff);
   acediff.editors.right.ace.on('change', diff);
@@ -453,12 +456,27 @@ function updateGap(acediff, editor, scroll) {
   positionCopyContainers(acediff);
 }
 
+function updateGapScrollLeft(acediff, editor, scroll) { 
+  if(acediff.options.lockScrolling){
+    //editors.left and editors.right Synchronous scrolling
+    synchronousScrollingLeft(acediff, editor, scroll);
+  };
+}
+
 //editors.left and editors.right Synchronous scrolling
 function synchronousScrolling(acediff, editor, scroll){
   if(editor == "left"){
     acediff.editors.right.ace.getSession().setScrollTop(parseInt(scroll, 10));
   }else if(editor == "right"){
     acediff.editors.left.ace.getSession().setScrollTop(parseInt(scroll, 10));
+  };
+}
+
+function synchronousScrollingLeft(acediff, editor, scroll){
+  if(editor == "left"){
+    acediff.editors.right.ace.getSession().setScrollLeft(parseInt(scroll, 10));
+  }else if(editor == "right"){
+    acediff.editors.left.ace.getSession().setScrollLeft(parseInt(scroll, 10));
   };
 }
 
