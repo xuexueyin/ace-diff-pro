@@ -113,8 +113,6 @@ function AceDiffPro(options) {
     editorHeight: null,
   };
 
-
-
   // set up the editors
   this.editors.left.ace.getSession().setMode(getMode(this, C.EDITOR_LEFT));
   this.editors.right.ace.getSession().setMode(getMode(this, C.EDITOR_RIGHT));
@@ -149,11 +147,25 @@ AceDiffPro.prototype = {
   // allows on-the-fly changes to the AceDiff instance settings
   setOptions(options) {
     merge(this.options, options);
+    this.editors.left.ace.setReadOnly(!this.options.left.editable);
+    this.editors.right.ace.setReadOnly(!this.options.right.editable);
     this.diff();
   },
   // Total number of changes
   getNumDiffs() {
     return this.diffs.length;
+  },
+
+  //Reset left.content
+  resetLeftContent() {
+    this.editors.left.ace.setValue(normalizeContent(this.options.left.content), -1);
+    this.diff();
+  },
+
+  //Reset right.content
+  resetRightContent() {
+    this.editors.right.ace.setValue(normalizeContent(this.options.right.content), -1);
+    this.diff();
   },
 
   //Add, Delete, Modify Total number of changes
