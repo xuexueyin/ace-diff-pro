@@ -40,6 +40,8 @@ function AceDiffPro(options) {
     showModify: true, //修改内容标示颜色
     showAdded: true,  //增加内容标示颜色
     showDeleted:true, //删除内容标示颜色
+    leftContentChangesFun: null,
+    rightContentChangesFun: null,
     left: {
       id: null,
       content: null,
@@ -75,7 +77,7 @@ function AceDiffPro(options) {
   }, options);
 
   if (this.options.element === null) {
-    console.error('You need to specify an element for Ace-diff-pro');
+    // console.error('You need to specify an element for Ace-diff-pro');
     return;
   }
 
@@ -86,15 +88,21 @@ function AceDiffPro(options) {
   }
 
   if (!this.el) {
-    console.error(`Can't find the specified element ${this.options.element}`);
+    // console.error(`Can't find the specified element ${this.options.element}`);
     return;
   }
 
   this.options.left.id = ensureElement(this.el, 'acediff__left');
   this.options.classes.gutterID = ensureElement(this.el, 'acediff__gutter');
   this.options.right.id = ensureElement(this.el, 'acediff__right');
-
-  this.el.innerHTML = `<div class="acediff__wrap">${this.el.innerHTML}</div>`;
+  //修复重载文件后出现多层<div class="acediff__wrap"> 的情况。
+  // this.el.innerHTML = `<div class="acediff__wrap">${this.el.innerHTML}</div>`;
+  if(this.el.innerHTML.indexOf("acediff__wrap") > 0){
+    this.el.innerHTML = `${this.el.innerHTML}`;
+  }else{
+    this.el.innerHTML = `<div class="acediff__wrap">${this.el.innerHTML}</div>`;
+  };
+  
 
   // instantiate the editors in an internal data structure
   // that will store a little info about the diffs and
@@ -165,6 +173,18 @@ AceDiffPro.prototype = {
   //Reset right.content
   resetRightContent() {
     this.editors.right.ace.setValue(normalizeContent(this.options.right.content), -1);
+    this.diff();
+  },
+
+  //update left.content
+  updateLeftContent(content) {
+    this.editors.left.ace.setValue(normalizeContent(content), -1);
+    this.diff();
+  },
+
+  //update right.content
+  updateRightContent(content) {
+    this.editors.right.ace.setValue(normalizeContent(content), -1);
     this.diff();
   },
 
@@ -263,11 +283,10 @@ AceDiffPro.prototype = {
       left: 0,
       right: 0,
     };
-
+        
     diff.forEach(function (chunk, index, array) {
       const chunkType = chunk[0];
       let text = chunk[1];
-
       // Fix for #28 https://github.com/ace-diff/ace-diff/issues/28
       if (array[index + 1] && text.endsWith('\n') && array[index + 1][1].startsWith('\n')) {
         text += '\n';
@@ -293,6 +312,44 @@ AceDiffPro.prototype = {
 
     // simplify our computed diffs; this groups together multiple diffs on subsequent lines
     this.diffs = simplifyDiffs(this, diffs);
+
+    //Monitor Left content changes
+    let leftContentChanges = false, rightContentChanges = false;
+    if(this.options.left.content && val1){
+      const dmpLeft = new DiffMatchPatch();
+      let diffLeft = dmpLeft.diff_main(this.options.left.content, val1);
+      for (let a = 0; a < diffLeft.length; a++) {
+        if(diffLeft[a][0] == 1){
+          //changes Row
+          leftContentChanges = true;
+          break;
+        };
+      };
+    };
+    //Monitor Right content changes
+    if(this.options.right.content && val2){
+      const dmpRight = new DiffMatchPatch();
+      let diffRight = dmpRight.diff_main(this.options.right.content, val2);
+      for (let b = 0; b < diffRight.length; b++) {
+        if(diffRight[b][0] == 1){
+          //changes Row
+          rightContentChanges = true;
+          break;
+        };
+      };
+    };
+    if(leftContentChanges){
+      //left content changes
+      if(this.options.leftContentChangesFun){
+        this.options.leftContentChangesFun(leftContentChanges);
+      };
+    };
+    if(rightContentChanges){
+      //right content changes
+      if(this.options.rightContentChangesFun){
+        this.options.rightContentChangesFun(rightContentChanges);
+      };
+    };
 
     // if we're dealing with too many diffs, fail silently
     if (this.diffs.length > this.options.maxDiffs) {
