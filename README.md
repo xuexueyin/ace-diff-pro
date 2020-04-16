@@ -150,6 +150,8 @@ Here are all the defaults. I'll explain each one in details below. Note: you onl
 - `showAdded` (boolean, optional, default: `true`). Added content color.
 - `showDeleted` (boolean, optional, default: `true`). Deleted content color.
 - `lockScrolling` (boolean, optional, default: `false`). editors.left and editors.right Synchronous scrolling.
+- `leftContentChangesFun` (Callback method). Monitor Left content changes 
+- `rightContentChangesFun` (Callback method). Monitor Right content changes  
 
 ### Classes
 - `diff`: the class for a diff line on either editor
@@ -171,6 +173,10 @@ There are a few API methods available on your AceDiff instance.
 - `aceInstance.diff()`: updates the diff. This shouldn't ever be required because AceDiff automatically recognizes the key events like changes to the editor and window resizing. But I've included it because there may always be that fringe case...
 - `aceInstance.destroy()`: destroys the AceDiff instance. Basically this just destroys both editors and cleans out the gutter.
 - `aceInstance.getNumDiffsAddDeleteModify()`: Returns the number of differences currently displayed, deleted, and modified.
+- `resetLeftContent`: Reload left.content and modify left.content data
+- `resetRightContent`: Reload right.content and modify right.content data
+- `updateLeftContent`: Update left.content does not modify left.content data
+- `updateRightContent`: Update right.content does not modify right.content data
 
 
 ## Browser Support
