@@ -319,8 +319,8 @@ AceDiffPro.prototype = {
       const dmpLeft = new DiffMatchPatch();
       let diffLeft = dmpLeft.diff_main(this.options.left.content, val1);
       for (let a = 0; a < diffLeft.length; a++) {
-        if(diffLeft[a][0] == 1){
-          //changes Row
+        if(diffLeft[a][0] == 1 || diffLeft[a][0] == -1){
+          //changes Row:1 add data; -1 delete data
           leftContentChanges = true;
           break;
         };
@@ -331,8 +331,8 @@ AceDiffPro.prototype = {
       const dmpRight = new DiffMatchPatch();
       let diffRight = dmpRight.diff_main(this.options.right.content, val2);
       for (let b = 0; b < diffRight.length; b++) {
-        if(diffRight[b][0] == 1){
-          //changes Row
+        if(diffRight[b][0] == 1 || diffRight[b][0] == -1){
+          //changes Row:1 add data; -1 delete data
           rightContentChanges = true;
           break;
         };
