@@ -42,13 +42,15 @@ function AceDiffPro(options) {
     showDeleted:true, //删除内容标示颜色
     leftContentChangesFun: null,
     rightContentChangesFun: null,
+    copyRightLinkTitle:"Copy to right",
+    copyLeftLinkTitle:"Copy to left",
     left: {
       id: null,
       content: null,
       mode: null,
       theme: null,
       editable: true,
-      copyLinkEnabled: true,
+      copyLinkEnabled: false,
     },
     right: {
       id: null,
@@ -56,7 +58,7 @@ function AceDiffPro(options) {
       mode: null,
       theme: null,
       editable: true,
-      copyLinkEnabled: true,
+      copyLinkEnabled: false,
     },
     classes: {
       gutterID: 'acediff__gutter',
@@ -597,7 +599,7 @@ function addCopyArrows(acediff, info, diffIndex) {
     var arrow = createArrow({
       className: acediff.options.classes.newCodeConnectorLink,
       topOffset: info.leftStartLine * acediff.lineHeight,
-      tooltip: 'Copy to right',
+      tooltip: acediff.options.copyRightLinkTitle,//'Copy to right',
       diffIndex,
       arrowContent: acediff.options.classes.newCodeConnectorLinkContent,
     });
@@ -608,7 +610,7 @@ function addCopyArrows(acediff, info, diffIndex) {
     var arrow = createArrow({
       className: acediff.options.classes.deletedCodeConnectorLink,
       topOffset: info.rightStartLine * acediff.lineHeight,
-      tooltip: 'Copy to left',
+      tooltip: acediff.options.copyLeftLinkTitle,//'Copy to left',
       diffIndex,
       arrowContent: acediff.options.classes.deletedCodeConnectorLinkContent,
     });
@@ -616,6 +618,30 @@ function addCopyArrows(acediff, info, diffIndex) {
   }
 }
 
+function removeCopyArrows(acediff) {
+  if(acediff){
+    let a = 0;
+    if(acediff.copyRightContainer){
+      for (let a = 0; a < acediff.copyRightContainer.childNodes.length; a++) {
+        acediff.copyRightContainer.removeChild(acediff.copyRightContainer.childNodes[a]);
+        a--;
+      };
+    };
+    if(acediff.copyLeftContainer){
+      for (let a = 0; a < acediff.copyLeftContainer.childNodes.length; a++) {
+        acediff.copyLeftContainer.removeChild(acediff.copyLeftContainer.childNodes[a]);
+        a--;
+      };
+    };
+    //删除浏览器上数据
+    const gutterEl = document.getElementById(acediff.options.classes.gutterID);
+    if(gutterEl){
+      for (a = 0; a < gutterEl.childNodes.length; a++) {
+        gutterEl.childNodes[a].innerHTML = "";
+      };
+    };
+  }
+}
 
 function positionCopyContainers(acediff) {
   const leftTopOffset = acediff.editors.left.ace.getSession().getScrollTop();
@@ -972,7 +998,9 @@ function simplifyDiffs(acediff, diffs) {
 function decorate(acediff) {
   clearGutter(acediff);
   clearArrows(acediff);
-
+  if(!acediff.options.left.copyLinkEnabled || !acediff.options.right.copyLinkEnabled){
+    removeCopyArrows(acediff);
+  };
   acediff.diffs.forEach(function (info, diffIndex) {
     //判断差异类型
     if (this.options.showDiffs) {
