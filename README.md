@@ -103,6 +103,12 @@ Here are all the defaults. I'll explain each one in details below. Note: you onl
   showAdded: true,
   showDeleted:true,
   lockScrolling: false,
+  leftContentChangesFun: null,
+  rightContentChangesFun: null,
+  copyRightLinkTitle:"Copy to right",
+  copyLeftLinkTitle:"Copy to left",
+  leftContentOldData:null, 
+  rightContentOldData: null, 
   left: {
     content: null,
     mode: null,

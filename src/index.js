@@ -44,6 +44,8 @@ function AceDiffPro(options) {
     rightContentChangesFun: null,
     copyRightLinkTitle:"Copy to right",
     copyLeftLinkTitle:"Copy to left",
+    leftContentOldData:null, //存放第一次加载文件的内容
+    rightContentOldData: null, //存放第一次加载文件的内容
     left: {
       id: null,
       content: null,
@@ -146,6 +148,15 @@ function AceDiffPro(options) {
     addEventHandlers(this);
     createCopyContainers(this);
     createGutter(this);
+
+    // 第一次加载时的文件内容
+    if(this.options.left.content){
+      this.options.leftContentOldData = this.editors.left.ace.getSession().getValue();
+    };
+    //第一次加载时的文件内容
+    if(this.options.right.content){
+      this.options.rightContentOldData = this.editors.right.ace.getSession().getValue();
+    };
     this.diff();
   }, 1);
 }
@@ -317,9 +328,9 @@ AceDiffPro.prototype = {
 
     //Monitor Left content changes
     let leftContentChanges = false, rightContentChanges = false;
-    if(this.options.left.content && val1){
+    if(this.options.leftContentOldData){
       const dmpLeft = new DiffMatchPatch();
-      let diffLeft = dmpLeft.diff_main(this.options.left.content, val1);
+      let diffLeft = dmpLeft.diff_main(val1, this.options.leftContentOldData);
       for (let a = 0; a < diffLeft.length; a++) {
         if(diffLeft[a][0] == 1 || diffLeft[a][0] == -1){
           //changes Row:1 add data; -1 delete data
@@ -329,11 +340,11 @@ AceDiffPro.prototype = {
       };
     };
     //Monitor Right content changes
-    if(this.options.right.content && val2){
+    if(this.options.rightContentOldData){
       const dmpRight = new DiffMatchPatch();
-      let diffRight = dmpRight.diff_main(this.options.right.content, val2);
+      let diffRight = dmpRight.diff_main(val2, this.options.rightContentOldData);
       for (let b = 0; b < diffRight.length; b++) {
-        if(diffRight[b][0] == 1 || diffRight[b][0] == -1){
+        if(diffRight[b][0] == 1 || diffRight[b][0] == -1 ){
           //changes Row:1 add data; -1 delete data
           rightContentChanges = true;
           break;
